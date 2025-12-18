@@ -53,8 +53,8 @@ func (s *Scheduler) Start() error {
 		return err
 	}
 
-	// Send weekly reports every Monday at 9:00 AM
-	_, err = s.cron.AddFunc("0 9 * * 1", func() {
+	// Send weekly reports every Monday at 7:00 AM
+	_, err = s.cron.AddFunc("0 7 * * 1", func() {
 		log.Println("Sending weekly reports...")
 		if err := s.sendWeeklyReports(); err != nil {
 			log.Printf("Error sending weekly reports: %v", err)
@@ -64,8 +64,8 @@ func (s *Scheduler) Start() error {
 		return err
 	}
 
-	// Send daily problems at 9:00 AM
-	_, err = s.cron.AddFunc("0 9 * * *", func() {
+	// Send daily problems at 7:00 AM
+	_, err = s.cron.AddFunc("0 7 * * *", func() {
 		log.Println("Sending daily problems...")
 		if err := s.sendDailyProblems(); err != nil {
 			log.Printf("Error sending daily problems: %v", err)
