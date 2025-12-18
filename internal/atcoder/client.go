@@ -15,11 +15,12 @@ type Client struct {
 
 // NewClient creates a new AtCoder Problems API client
 func NewClient(baseURL string) *Client {
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
 	return &Client{
-		BaseURL: baseURL,
-		HTTPClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
+		BaseURL:    baseURL,
+		HTTPClient: client,
 	}
 }
 
@@ -27,7 +28,15 @@ func NewClient(baseURL string) *Client {
 func (c *Client) get(endpoint string) ([]byte, error) {
 	url := fmt.Sprintf("%s%s", c.BaseURL, endpoint)
 
-	resp, err := c.HTTPClient.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Add User-Agent header
+	req.Header.Set("User-Agent", "coding-winner-bot/1.0 (https://github.com/)")
+
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request: %w", err)
 	}

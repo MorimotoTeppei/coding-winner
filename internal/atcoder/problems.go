@@ -24,7 +24,7 @@ type ProblemDifficulty struct {
 
 // GetAllProblems retrieves all problems
 func (c *Client) GetAllProblems() ([]*ProblemResponse, error) {
-	endpoint := "/atcoder-api/v3/problems"
+	endpoint := "/resources/problems.json"
 
 	body, err := c.get(endpoint)
 	if err != nil {
@@ -41,23 +41,24 @@ func (c *Client) GetAllProblems() ([]*ProblemResponse, error) {
 
 // GetProblemDifficulties retrieves problem difficulties
 func (c *Client) GetProblemDifficulties() (map[string]*int, error) {
-	endpoint := "/atcoder-api/v3/problem_models"
+	endpoint := "/resources/problem-models.json"
 
 	body, err := c.get(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	var difficulties []*ProblemDifficulty
-	if err := json.Unmarshal(body, &difficulties); err != nil {
+	// Parse as map instead of array
+	var difficultiesMap map[string]*ProblemDifficulty
+	if err := json.Unmarshal(body, &difficultiesMap); err != nil {
 		return nil, fmt.Errorf("failed to parse difficulties: %w", err)
 	}
 
 	// Create map of problem_id -> difficulty
 	diffMap := make(map[string]*int)
-	for _, d := range difficulties {
-		if !d.IsExperimental && d.Difficulty != nil {
-			diffMap[d.ProblemID] = d.Difficulty
+	for problemID, d := range difficultiesMap {
+		if d != nil && !d.IsExperimental && d.Difficulty != nil {
+			diffMap[problemID] = d.Difficulty
 		}
 	}
 
